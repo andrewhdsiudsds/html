@@ -10,38 +10,64 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #2C3E50, #000000); /* Cool gradient background */
+            background: linear-gradient(45deg, #0a0a2e, #1a1a1a);
             margin: 0;
             padding: 0;
+            min-height: 100vh;
+            overflow: hidden;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        .scene {
+            position: relative;
+            width: 100%;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            color: #ecf0f1; /* Light, readable text */
-            overflow: hidden; /* Hide potential scrollbars */
+            transform-style: preserve-3d;
+            transition: transform 0.3s;
         }
 
         .container {
-            background-color: rgba(34, 49, 63, 0.9); /* Semi-transparent container */
+            background: rgba(10, 10, 46, 0.9);
             padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7); /* Deeper shadow */
+            border-radius: 15px;
             width: 90%;
             max-width: 700px;
-            text-align: center; /* Center align content */
-            position: relative; /* For positioning the timer */
+            position: relative;
+            transform-style: preserve-3d;
+            box-shadow: 0 0 50px rgba(106, 227, 255, 0.2);
+            border: 1px solid rgba(106, 227, 255, 0.3);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #6ae3ff, #ff61fa);
+            z-index: -1;
+            border-radius: 17px;
+            animation: hologram 3s infinite linear;
         }
 
         h1 {
-            font-size: 2.5rem; /* Larger, more impactful title */
+            font-size: 2.5rem;
             margin-bottom: 30px;
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Title shadow */
+            color: #6ae3ff;
+            text-shadow: 0 0 15px rgba(106, 227, 255, 0.5);
+            position: relative;
         }
 
         .version-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             list-style: none;
             padding: 0;
@@ -49,30 +75,49 @@
         }
 
         .version-card {
-            background-color: #34495E; /* Dark card background */
+            background: rgba(20, 20, 60, 0.8);
             border-radius: 10px;
             padding: 25px;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            transition: all 0.3s ease;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(106, 227, 255, 0.3);
         }
 
         .version-card:hover {
-            transform: translateY(-5px) scale(1.02); /* Subtle hover effect */
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+            transform: translateY(-5px) scale(1.02);
+            background: rgba(30, 30, 80, 0.9);
+            box-shadow: 0 0 25px rgba(106, 227, 255, 0.3);
         }
 
-        .version-card a {
-            text-decoration: none;
-            color: #fff;
-            display: block; /* Make the whole card clickable */
+        .version-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: skewX(-45deg);
+            transition: left 0.5s;
+        }
+
+        .version-card:hover::before {
+            left: 200%;
         }
 
         .version-title {
             font-size: 1.4rem;
             font-weight: bold;
             margin-bottom: 10px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+            color: #ff61fa;
+            text-shadow: 0 0 10px rgba(255, 97, 250, 0.3);
         }
 
         .version-description {
@@ -84,39 +129,55 @@
 
         .version-meta {
             font-size: 0.8rem;
-            color: #777;
+            color: #6ae3ff;
             margin-top: 10px;
-            text-align: left; /* Align meta info to the left */
-        }
-
-        /* Optional: Add a subtle animation on load */
-        .container {
-            animation: fadeIn 1s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            text-align: left;
         }
 
         #timer {
             position: absolute;
             top: 10px;
             right: 10px;
-            background-color: rgba(0, 0, 0, 0.6);
-            color: #fff;
+            background: rgba(0, 0, 0, 0.6);
+            color: #ff61fa;
             padding: 8px 12px;
             border-radius: 8px;
             font-size: 1rem;
             font-weight: bold;
+            box-shadow: 0 0 10px rgba(255, 97, 250, 0.3);
+        }
+
+        @keyframes hologram {
+            0% { opacity: 0.2; }
+            50% { opacity: 0.5; }
+            100% { opacity: 0.2; }
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0) 0px,
+                rgba(0, 0, 0, 0) 1px,
+                rgba(255, 255, 255, 0.05) 2px,
+                rgba(255, 255, 255, 0.05) 3px
+            );
+            pointer-events: none;
+            z-index: 999;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔥 Select version! 🔥</h1>
-        <div id="timer">20</div>
-        <ul class="version-grid">
+    <div class="scanlines"></div>
+    <div class="scene">
+        <div class="container">
+            <center><h1>🔥 Select version! 🔥</h1></center>
+            <div id="timer">20</div>
+            <ul class="version-grid">
             <li class="version-card" data-href="https://happinessad.github.io/html/a1">
                 <a href="https://happinessad.github.io/html/a1">
                     <h2 class="version-title">🚀 1.5.2-sp2.01</h2>
@@ -145,10 +206,33 @@
                     <span class="version-meta">PvP Powerhouse (Modded)</span>
                 </a>
             </li>
-        </ul>
+            </ul>
+        </div>
     </div>
 
     <script>
+        // Camera movement
+        const scene = document.querySelector('.scene');
+        let mouseX = 0;
+        let mouseY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - window.innerWidth/2) * 0.01;
+            mouseY = (e.clientY - window.innerHeight/2) * 0.01;
+
+            scene.style.transform = `
+                rotateX(${-mouseY}deg)
+                rotateY(${mouseX}deg)
+                translateZ(50px)
+            `;
+
+            document.querySelector('.container').style.transform = `
+                translateX(${mouseX * 0.3}px)
+                translateY(${mouseY * 0.3}px)
+            `;
+        });
+
+        // Timer logic remains the same
         let timeLeft = 20;
         const timerDisplay = document.getElementById('timer');
         let countdownInterval;
@@ -158,7 +242,6 @@
             timerDisplay.textContent = timeLeft;
             if (timeLeft <= 0) {
                 clearInterval(countdownInterval);
-                // Redirect to the first version (1.5.2-sp2.01)
                 window.location.href = 'https://happinessad.github.io/html/a1';
             }
             timeLeft--;
@@ -172,14 +255,12 @@
             clearInterval(countdownInterval);
         }
 
-        // Add event listeners to version cards to stop the timer when a version is selected
         versionCards.forEach(card => {
             card.addEventListener('click', () => {
                 stopTimer();
             });
         });
 
-        // Start the timer when the page loads
         startTimer();
     </script>
 </body>
